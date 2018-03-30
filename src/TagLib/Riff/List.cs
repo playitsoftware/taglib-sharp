@@ -25,6 +25,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Globalization;
+using System.Linq;
 using System.Runtime.Serialization;
 
 namespace TagLib.Riff {
@@ -278,14 +279,24 @@ namespace TagLib.Riff {
 				int length = data.Count;
 				while (length > 0 && data [length - 1] == 0)
 					length --;
-				
-				result [i] = data
-					.ToString (StringType.UTF8, 0, length);
+
+				var value = data.ToString (StringType.UTF8, 0, length);
+
+				if(HasInvalidCharacter(value))
+				{
+					var newValue = data.ToString(StringType.Latin1, 0, length); // latin1 fallback
+					if(!HasInvalidCharacter(newValue))
+					{
+						value = newValue;
+					}
+				}
+
+				result [i] = value;
 			}
 			
 			return result;
 		}
-		
+
 		/// <summary>
 		///    Gets the values for a specified item in the current
 		///    instance as a <see cref="StringCollection" />.
@@ -605,6 +616,11 @@ namespace TagLib.Riff {
 				offset += 8 + length;
 			}
 		}
-#endregion
+
+		private bool HasInvalidCharacter(string value)
+		{
+			return value.Any(c => c == 0xFFFD); // U+FFFD (decimal 65533) is the "replacement character"
+		}
+		#endregion
 	}
 }
