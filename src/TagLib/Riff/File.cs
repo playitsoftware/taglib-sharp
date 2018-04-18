@@ -584,6 +584,7 @@ namespace TagLib.Riff
 				// "ID32" is a custom box for this format that
 				// contains an ID3v2 tag.
 				case "ID32":
+				case "ID3 ": // mp3tag uses ID3
 					if (read_tags && id32_tag == null)
 						id32_tag = new Id3v2.Tag (this,
 							position + 8);
