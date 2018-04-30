@@ -469,6 +469,7 @@ namespace TagLib.Riff
 			long position = 12;
 			long length = Length;
 			uint size = 0;
+			uint padByte = 0;
 			TimeSpan duration = TimeSpan.Zero;
 			ICodec [] codecs = new ICodec [0];
 			
@@ -620,9 +621,11 @@ namespace TagLib.Riff
 						tag_end = position + 8 + size;
 					}
 				}
-				
+
+				padByte = size % 2;
+
 				// Move to the next item.
-			} while ((position += 8L + size) + 8 < length);
+			} while ((position += 8L + size + padByte) + 8 < length);
 			
 			// If we're reading properties, and one were found,
 			// throw an exception. Otherwise, create the Properties
